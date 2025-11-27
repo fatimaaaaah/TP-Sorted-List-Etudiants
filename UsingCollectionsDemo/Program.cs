@@ -9,10 +9,10 @@ namespace UsageCollections
         {
             SortedList listeEtudiants = new SortedList();
 
+            // === Saisie des étudiants ===
             Console.Write("Combien d'étudiants voulez-vous saisir ? ");
             int n = int.Parse(Console.ReadLine());
 
-            // === Saisie des étudiants ===
             for (int i = 0; i < n; i++)
             {
                 Console.WriteLine($"\n--- Étudiant {i + 1} ---");
@@ -50,11 +50,16 @@ namespace UsageCollections
             {
                 Console.Write("\nNombre de lignes par page (5 à 15) : ");
                 lignesParPage = int.Parse(Console.ReadLine());
-            }
-            while (lignesParPage < 5 || lignesParPage > 15);
+            } while (lignesParPage < 5 || lignesParPage > 15);
 
             int page = 1;
             int totalPages = (int)Math.Ceiling((double)listeEtudiants.Count / lignesParPage);
+
+            // Calcul de la moyenne globale de la classe
+            double moyenneClasse = 0;
+            foreach (Etudiant e in listeEtudiants.Values)
+                moyenneClasse += e.Moyenne;
+            moyenneClasse /= listeEtudiants.Count;
 
             bool continuer = true;
 
@@ -67,23 +72,21 @@ namespace UsageCollections
                 int debut = (page - 1) * lignesParPage;
                 int fin = Math.Min(debut + lignesParPage, listeEtudiants.Count);
 
-                double totalMoy = 0;
+                // === Affichage du tableau avec en-têtes ===
+                Console.WriteLine("{0,-5} | {1,-15} | {2,-15} | {3,5} | {4,5} | {5,7}",
+                    "NO", "Nom", "Prénom", "CC", "Devoir", "Moyenne");
+                Console.WriteLine(new string('-', 65));
 
                 // === Affichage des étudiants dans la page ===
                 for (int i = debut; i < fin; i++)
                 {
-                    DictionaryEntry entry = (DictionaryEntry)listeEtudiants[i];
-                    Etudiant e = (Etudiant)entry.Value;
+                    Etudiant e = (Etudiant)listeEtudiants.GetByIndex(i);
 
-                    Console.WriteLine(
-                        $"NO: {e.NO} | Nom: {e.Nom} | Prénom: {e.Prenom} | CC: {e.NoteCC} | Devoir: {e.NoteDevoir} | Moyenne: {e.Moyenne:F2}"
-                    );
-
-                    totalMoy += e.Moyenne;
+                    Console.WriteLine("{0,-5} | {1,-15} | {2,-15} | {3,5:F1} | {4,5:F1} | {5,7:F2}",
+                        e.NO, e.Nom, e.Prenom, e.NoteCC, e.NoteDevoir, e.Moyenne);
                 }
 
-                Console.WriteLine("\nMoyenne de la classe : " +
-                    (totalMoy / listeEtudiants.Count).ToString("F2"));
+                Console.WriteLine("\nMoyenne de la classe : " + moyenneClasse.ToString("F2"));
 
                 // === Navigation ===
                 Console.WriteLine("\nOptions :");
